@@ -1,5 +1,7 @@
 #!/usr/bin/env python3
 
+import os
+
 import numpy as np
 import pandas as pd
 
@@ -20,16 +22,9 @@ def get_latlon(x):
     
     return x
 
-rbn_spots = pd.read_csv('20170723.csv', header=0, usecols=['dx', 'db'])
-
-print('Getting dx lat & lon.')
-
-rbn_spots = rbn_spots.apply(get_latlon, axis=1)
-
-print('Removing empty values.')
-
-rbn_spots = rbn_spots.loc[rbn_spots.dx_lat.notnull()].loc[rbn_spots.dx_lon.notnull()]
-
-print('Saving.')
-
-rbn_spots.to_csv('20170723_located.csv')
+for filename in os.listdir('./raw'):
+    print('Operating on: ./raw/{}'.format(filename))
+    df = pd.read_csv('./raw/{}'.format(filename), header=0)
+    df = df.apply(get_latlon, axis=1)
+    df = df[df.dx_lat.notnull() & df.dx_lon.notnull()]
+    df.to_csv('./located/{}'.format(filename, index=False))
